@@ -3,133 +3,20 @@
 
 #include <iostream>
 #include <fstream>
-
-class Vector3f {
-
-	float _item[3];
-
-	public:
-
-	float & operator [] (int i) {
-		return _item[i];
-    	}
-
-	float operator [] (int i) const {
-		return _item[i];
-    	}
-
-
-	Vector3f(float x, float y, float z) 
-	{  _item[0] = x ; _item[1] = y ; _item[2] = z; };
-
-	Vector3f() { _item[0]=_item[1]=_item[2]=0.f;};
-
-
-	Vector3f & operator = (const Vector3f & obj) 
-	{
-		_item[0] = obj[0];
-		_item[1] = obj[1];
-		_item[2] = obj[2];
-
-		return *this;
-	};
-
-	Vector3f & operator += (const Vector3f & obj) 
-	{
-		_item[0] += obj[0];
-		_item[1] += obj[1];
-		_item[2] += obj[2];
-
-		return *this;
-	};
-
-
-	Vector3f & operator -= (const Vector3f & obj) 
-	{
-		_item[0] -= obj[0];
-		_item[1] -= obj[1];
-		_item[2] -= obj[2];
-
-		return *this;
-	};
-
-    
-	Vector3f & operator /= (const float & f) 
-	{
-		_item[0] /= f;
-		_item[1] /= f;
-		_item[2] /= f;
-
-		return *this;
-	};
-
-      
-
-	float distance(Vector3f & v) 
-	{
-		float ret=0.f;
-
-		ret = (v[0]-_item[0])*(v[0]-_item[0]) 
-		    + (v[1]-_item[1])*(v[1]-_item[1])
-		    + (v[2]-_item[2])*(v[2]-_item[2]);
-
-		ret = sqrt(ret);
-
-		return ret;
-	}
-
-
-	float dot(const Vector3f & input) const
-	{
-		return input._item[0]*_item[0] + input._item[1]*_item[1] + input._item[2]*_item[2] ; 
-	}
-
-	float normalize()
-	{
-		float ret = sqrt(_item[0]*_item[0] + _item[1]*_item[1] + _item[2]*_item[2]); 
-		for (int i = 0; i < 3; i++) _item[i] /= ret;
-
-		return ret;
-	}
-
-        float printitem(int i)
-        {
-             return _item[i];
-        }
-
-
-	friend Vector3f operator % ( const Vector3f &ob1, const Vector3f &ob2);
-	friend Vector3f operator - ( const Vector3f &ob1, const Vector3f &ob2);
-	friend Vector3f operator + ( const Vector3f &ob1, const Vector3f &ob2);
-
-};
-
-
-
+#include <cmath>
+#include "Vector3f.hpp"
 
 class Matrix4f {
 	float _item[4][4];
 
 	public:
-
-	float & operator () (int i, int j) {
+	[[nodiscard]] float& operator() (const int i, const int j) noexcept{
 		return _item[i][j];
-    	}
+    }
 
-	float  operator () (int i, int j) const {
+	[[nodiscard]]float operator() (const int i, const int j) const noexcept{
 		return _item[i][j];
-    	}
-
-	
-	void setIdentity() 
-	{
-		for (int i = 0; i < 4; i++) 
-			for (int j = 0; j < 4; j++) 
-				_item[i][j] = 0;
-		_item[0][0] = _item[1][1] = _item[2][2] = _item[3][3] = 1.;
-	}
-
-
+    }
 
 	Matrix4f() 
 	{ 
@@ -149,34 +36,51 @@ class Matrix4f {
 		_item[3][0]=a30;_item[3][1]=a31;_item[3][2]=a32;_item[3][3]=a33;
 	}
 
+	void setIdentity() 
+	{
+		for (int i = 0; i < 4; i++) 
+			for (int j = 0; j < 4; j++) 
+				_item[i][j] = 0;
+		_item[0][0] = _item[1][1] = _item[2][2] = _item[3][3] = 1.;
+	}
 
-	float lu(Matrix4f & a, int ip[]);
+	[[nodiscard]] float lu(Matrix4f & a, int ip[]);
 
-	float inv(Matrix4f & a, Matrix4f & a_inv);
+	[[nodiscard]] float inv(Matrix4f & a, Matrix4f & a_inv);
 
-	Matrix4f operator !();
+	[[nodiscard]] Matrix4f operator !() noexcept;
 
-	void setTranslation(const Vector3f  & vec) ;
+	void setTranslation(const Vector3f& vec) ;
 
-	Matrix4f & operator *= (const Matrix4f& m2);
+	[[nodiscard]] Matrix4f& operator*= (const Matrix4f& m2) noexcept;
 
-	Matrix4f trans();
+	[[nodiscard]] Matrix4f trans();
 
-	Matrix4f & operator = ( const Matrix4f & obj );
+	[[nodiscard]] Matrix4f& operator= ( const Matrix4f & obj )noexcept;
 
-	friend Vector3f operator *  (const Matrix4f & obj1, const Vector3f & obj2) ;
-	friend Matrix4f operator *  (const Matrix4f & obj1, const Matrix4f & obj2) ;
+	[[nodiscard]]Vector3f getMulti(const Matrix4f& mat,const Vector3f& vec) 
+	{
+		Vector3f ret{};
+
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++)
+			{
+				ret[i] += mat(i,j)* vec[j];
+			}
+			ret[i] += mat(i,3);
+		}
+		
+		return ret;
+	}
+
+	friend Matrix4f operator*(const Matrix4f & obj1, const Matrix4f & obj2) noexcept;
 };
+
 
 
 Matrix4f rotX(const float & rad );
 Matrix4f rotY(const float & rad);
 Matrix4f rotZ(const float & rad);
-Matrix4f translation(const Vector3f  & vec);
-
-Vector3f operator - (const Vector3f& v1, const Vector3f& v2);
-Vector3f operator + (const Vector3f& v1, const Vector3f& v2);
-Vector3f operator % ( const Vector3f & ob1, const Vector3f & ob2);
-float distance(Vector3f & v1, Vector3f & v2);
+Matrix4f translation(const Vector3f& vec);
 
 #endif // _matrix_H

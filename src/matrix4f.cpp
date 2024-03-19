@@ -4,7 +4,6 @@ using namespace std;
 #include "../inc/matrix4f.hpp"
 
 
-
 ostream & operator << (ostream & stream, Matrix4f & obj) 
 {
 	for (int i = 0; i < 4; i++) {
@@ -77,25 +76,28 @@ Matrix4f rotZ(const float & rad)
 }
 
 
-float Matrix4f::lu(Matrix4f & a, int ip[])
+[[nodiscard]]float Matrix4f::lu(Matrix4f & a, int ip[])
 {
 	int n = 4;
 
 	int i, j, k, ii, ik;
 	float t, u, det;
-	float *weight = new float[n]; 
+	float weight[n]; 
 
-	det = 0;             
+	det = 0.0;             
 	for (k = 0; k < n; k++) {  
 		ip[k] = k;          
 		u = 0;                
 		for (j = 0; j < n; j++) {
 			t = fabs(a(k,j));  if (t > u) u = t;
 		}
-		if (u == 0) goto EXIT; 
+		if (u == 0)
+		{
+			return det;
+		} 
 		weight[k] = 1 / u;     
 	}
-	det = 1;                   
+	det = 1.0;                   
 	for (k = 0; k < n; k++) {  
 		u = -1;
 		for (i = k; i < n; i++) {  
@@ -109,7 +111,10 @@ float Matrix4f::lu(Matrix4f & a, int ip[])
 			det = -det;  
 		}
 		u = a(ik,k);  det *= u; 
-		if (u == 0) goto EXIT;    
+		if (u == 0)
+		{
+			return det;
+		}    
 		for (i = k + 1; i < n; i++) { 
 			ii = ip[i];
 			t = (a(ii,k) /= u);
@@ -117,15 +122,15 @@ float Matrix4f::lu(Matrix4f & a, int ip[])
 				a(ii, j) -= t * a(ik, j);
 		}
 	}
-EXIT:
+//EXIT:
 
-	delete [] weight;
+	//delete [] weight;
 
 	return det;         
 }
 
 
-float Matrix4f::inv(Matrix4f & a, Matrix4f & a_inv)
+[[nodiscard]]float Matrix4f::inv(Matrix4f & a, Matrix4f & a_inv)
 {
 
 	int n = 4;
@@ -133,8 +138,7 @@ float Matrix4f::inv(Matrix4f & a, Matrix4f & a_inv)
 	int i, j, k, ii;
 	float t, det;
 
-	int * ip = new int [n];
-
+	int ip[n];
 
 	det = lu(a, ip);
 
@@ -153,15 +157,13 @@ float Matrix4f::inv(Matrix4f & a, Matrix4f & a_inv)
 				a_inv(i,k) = t / a(ii,i);
 			}
 		}
-
-
-	delete [] ip ;
+	//delete [] ip ;
 
 	return det;
 }
 
 
-Matrix4f Matrix4f::operator !()
+[[nodiscard]]Matrix4f Matrix4f::operator!() noexcept
 {
 	Matrix4f mat(*this);
 	Matrix4f ret;
@@ -171,21 +173,7 @@ Matrix4f Matrix4f::operator !()
 	return ret;
 }
 
-
-Vector3f operator * (const Matrix4f & mat, const Vector3f & vec) 
-{
-	Vector3f ret(0.f,0.f,0.f);
-
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++)
-			ret[i] += mat(i,j) * vec[j];
-		ret[i] += mat(i,3);
-	}
-	
-	return ret;
-}
-
-Matrix4f & Matrix4f::operator = ( const Matrix4f & obj )
+[[nodiscard]]Matrix4f& Matrix4f::operator= ( const Matrix4f& obj ) noexcept
 {
 
 	for (int i =0; i < 4; i++) {
@@ -196,7 +184,7 @@ Matrix4f & Matrix4f::operator = ( const Matrix4f & obj )
     return *this; 
 }
 
-Matrix4f Matrix4f::trans()
+[[nodiscard]]Matrix4f Matrix4f::trans()
 {
 	Matrix4f ret;	
 
@@ -207,11 +195,11 @@ Matrix4f Matrix4f::trans()
 		}
 	}
 
-    	return ret; 
+    return ret; 
 }
 
 
-Matrix4f operator + (const Matrix4f& m1, const Matrix4f& m2)
+[[nodiscard]]Matrix4f operator+ (const Matrix4f& m1, const Matrix4f& m2) noexcept
 {
     Matrix4f m;
 
@@ -223,7 +211,7 @@ Matrix4f operator + (const Matrix4f& m1, const Matrix4f& m2)
     return m;
 }
 
-Matrix4f operator * (const Matrix4f& m1, const Matrix4f& m2)
+[[nodiscard]]Matrix4f operator*(const Matrix4f& m1, const Matrix4f& m2) noexcept
 {
     Matrix4f m;
     for (int i = 0; i < 4; ++i) {
@@ -237,12 +225,7 @@ Matrix4f operator * (const Matrix4f& m1, const Matrix4f& m2)
     return m;
 }
 
-
-
-
-
-
-Matrix4f & Matrix4f::operator *= (const Matrix4f& m2)
+[[nodiscard]]Matrix4f& Matrix4f::operator*= (const Matrix4f& m2)noexcept
 {
     Matrix4f m;
 
@@ -259,8 +242,7 @@ Matrix4f & Matrix4f::operator *= (const Matrix4f& m2)
     return *this;
 }
 
-
-Matrix4f translation(const Vector3f  & vec)
+[[nodiscard]]Matrix4f translation(const Vector3f& vec)
 {
 	Matrix4f m;
 
@@ -270,62 +252,12 @@ Matrix4f translation(const Vector3f  & vec)
 	return m;
 };
 
-void Matrix4f::setTranslation(const Vector3f  & vec) {
+void Matrix4f::setTranslation(const Vector3f& vec) {
 	for (int i = 0; i < 3; i++) 
 		_item[i][3] = vec[i];
 
 	_item[3][3] = 1.0;
 }
-
-
-
-Vector3f operator % ( const Vector3f & ob1, const Vector3f & ob2)
-{
-    int i;              // loop counter
-    Vector3f ret;            // return value
-    int N_DV3 = 3;	
-		
-    for (i = 0; i < N_DV3; i++)
-	ret._item[ i ] =
-	    ob1[ ( i + 1 ) % N_DV3 ] * ob2[ ( i + 2 ) % N_DV3 ]
-	    - ob2[ ( i + 1 ) % N_DV3 ] * ob1[ ( i + 2 ) % N_DV3 ];
-
-    return ret;
-}
-
-
-Vector3f operator + (const Vector3f& v1, const Vector3f& v2)
-{
-    Vector3f v(v1);
-    for (int i = 0; i < 3; i++)
-	v[i] += v2[i];
-
-    return v;
-}
-
-Vector3f operator - (const Vector3f& v1, const Vector3f& v2)
-{
-
-    Vector3f v(v1);
-    for (int i = 0; i < 3 ; i++)
-	v[i] -= v2[i];
-
-    return v;
-}
-
-
-
-
-float distance(Vector3f & v1, Vector3f & v2)
-{
-
-	float ret;
-
-	ret = sqrt((v2[0]-v1[0])*(v2[0]-v1[0]) + (v2[1]-v1[1])*(v2[1]-v1[1]) + (v2[2]-v1[2])*(v2[2]-v1[2]));
-
-	return ret;
-}
-
 
 ostream & operator << (ostream & stream, Vector3f & obj) 
 {
