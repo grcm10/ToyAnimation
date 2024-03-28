@@ -13,10 +13,9 @@ namespace View{
 
     struct Node {
         int _id;
+        float cost;
         std::vector<int> edges_to{};     
-        std::vector<float> edges_cost{};   
-        bool done;   
-        float cost;    
+        std::vector<float> edges_cost{};      
     };
 
     /**
@@ -34,7 +33,7 @@ namespace View{
         Vertex_Weight(float w[]){as_weight_value(w);};
         constexpr void as_weight_value(float w[])
         {
-            for(int i =0;i<21;i++)
+            for(size_t i =0;i<21;i++)
             {
                 v_weight.emplace_back(w[i]);
             }
@@ -113,14 +112,14 @@ namespace View{
         [[nodiscard]] int trigNum() const { return _trig.size() ;};
             
             
-        void getTriangleVertices( const int i, Vector3f& v1, Vector3f& v2, Vector3f& v3)
+        void getTriangleVertices( size_t i, Vector3f& v1, Vector3f& v2, Vector3f& v3)
         { 
             v1 = _v[_trig[i]._vertex[0]]; 
             v2 = _v[_trig[i]._vertex[1]]; 
             v3 = _v[_trig[i]._vertex[2]]; 
         }
         
-        void getTriangleNormals(const int i, Vector3f& v1, Vector3f& v2, Vector3f& v3)
+        void getTriangleNormals(size_t i, Vector3f& v1, Vector3f& v2, Vector3f& v3)
         {
             v1 = _vn[_trig[i]._normal[0]]; 
             v2 = _vn[_trig[i]._normal[1]]; 
@@ -128,22 +127,22 @@ namespace View{
         }
             
 
-        void getMorseValue(const int i, float& v1, float& v2, float& v3)
+        void getMorseValue(size_t i, float& v1, float& v2, float& v3)
         {
             v1 = _node[_trig[i]._vertex[0]].cost; 
             v2 = _node[_trig[i]._vertex[1]].cost; 
             v3 = _node[_trig[i]._vertex[2]].cost; 
         }
 
-        [[nodiscard]] float color(const int i) const { return _trig[i].color();};
+        [[nodiscard]] float color(size_t i) const { return _trig[i].color();};
 
 
-        void setMorseMinMax(const int i, const float min, const float max)
+        void setMorseMinMax(size_t i, const float min, const float max)
         {
             _trig[i].setMorseMinMax(min,max);
         }
 
-        void getMorseMinMax(const int i, float& min, float& max)
+        void getMorseMinMax(size_t i, float& min, float& max)
         {
             _trig[i].getMorseMinMax(min,max);
         }
@@ -153,7 +152,7 @@ namespace View{
         {
             Vector3f v1,v2,v3;
 
-            for (int i = 0 ;i < _trig.size(); i++){
+            for (size_t i = 0 ;i < _trig.size(); i++){
                 getTriangleVertices(i, v1,v2,v3);
                 v3 -= v1;
                 v2 -= v1;
@@ -164,7 +163,7 @@ namespace View{
 
         [[nodiscard]] int findEdgeID(const Edge& e, const std::vector<Edge>& list) const
         {
-            for (int i = 0; i < list.size(); i++) 
+            for (size_t i = 0; i < list.size(); i++) 
             {
                 if ((list[i].v1() == e.v1() && list[i].v2() == e.v2()) ||
                     (list[i].v2() == e.v1() && list[i].v1() == e.v2())) 
@@ -176,7 +175,7 @@ namespace View{
             return -1;
         }
 
-        void Weight_Calculation(const int i,Bone B,Vector3f &v1, Vector3f &v2, Vector3f &v3)
+        void Weight_Calculation(size_t i,Bone B,Vector3f &v1, Vector3f &v2, Vector3f &v3)
         {
             
             int number1 = _trig[i]._vertex[0];
@@ -185,8 +184,8 @@ namespace View{
             Vector3f ver1,ver2,ver3,vertex1,vertex2,vertex3;
             Matrix4f m{};
 
-            for(int j =0;j<21;j++){
-                ver1 = m.getMulti(B.Matrix[j+1],v1);
+            for(size_t j =0;j<21;j++){
+                ver1 = B.Matrix[j+1]*v1;
                 
                 vertex1[0] += _weight[number1].weight_value(j)*ver1[0];
                 vertex1[1] += _weight[number1].weight_value(j)*ver1[1];
@@ -196,8 +195,8 @@ namespace View{
 
             v1 = vertex1;
 
-            for(int j =0;j<21;j++){
-                ver2 = m.getMulti(B.Matrix[j+1],v2);
+            for(size_t j =0;j<21;j++){
+                ver2 = B.Matrix[j+1]*v2;
 
                 vertex2[0] += _weight[number2].weight_value(j)*ver2[0];
                 vertex2[1] += _weight[number2].weight_value(j)*ver2[1];
@@ -206,8 +205,8 @@ namespace View{
 
             v2 = vertex2;
         
-            for(int j =0;j<21;j++){
-                ver3 = m.getMulti(B.Matrix[j+1],v3);
+            for(size_t j =0;j<21;j++){
+                ver3 = B.Matrix[j+1]*v3;
 
                 vertex3[0] += _weight[number3].weight_value(j)*ver3[0]; 
                 vertex3[1] += _weight[number3].weight_value(j)*ver3[1];

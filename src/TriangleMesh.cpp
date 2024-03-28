@@ -184,10 +184,9 @@ void View::TriangleMesh::loadFile(const std::string& filename)
 			     << _trig[i].edge(2) << endl; 
 		*/
 
-        Vector3f tmpv{};
-        tmpv = tmpv.getRemainder(tmpv.getMinus(_v[_trig[i]._vertex[2]],_v[_trig[i]._vertex[0]]),tmpv.getMinus(_v[_trig[i]._vertex[1]],_v[_trig[i]._vertex[0]]));
-		//Vector3f tmpv = (_v[_trig[i]._vertex[2]] - _v[_trig[i]._vertex[0]]) % 
-		//		(_v[_trig[i]._vertex[1]] - _v[_trig[i]._vertex[0]]) ;
+        //Vector3f tmpv{};
+        //tmpv = tmpv.getRemainder(tmpv.getMinus(_v[_trig[i]._vertex[2]],_v[_trig[i]._vertex[0]]),tmpv.getMinus(_v[_trig[i]._vertex[1]],_v[_trig[i]._vertex[0]]));
+		Vector3f tmpv = (_v[_trig[i]._vertex[2]] - _v[_trig[i]._vertex[0]]) % (_v[_trig[i]._vertex[1]] - _v[_trig[i]._vertex[0]]) ;
 
 		tmpv.normalize();
 		facenorm[i] = tmpv;

@@ -1,23 +1,23 @@
 #include <iostream>
 #include <fstream>
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 #include <map>
 #include <set>
 #include "../inc/TriangleMesh.hpp"
 #include "../inc/Bone.hpp"
-
-GLdouble bodyWidth = 1.0;
 
 GLfloat angle = -150;   /* in degrees */
 GLfloat xloc = 0, yloc = 0, zloc = 0;
 static int moving = 0;
 static int beg = 0;
 static int newModel = 1;
-
+static int xt = 1;
+static int yt = 1;
+static int zt = 1;
+static int xr = 1;
 
 /* ARGSUSED3 */
-void
-mouse(int button, int state, int x, int y)
+void mouse(int button, int state, int x, int y)
 {
   if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
     moving = 1;
@@ -39,8 +39,7 @@ void motion(int x, int y)
   }
 }
 
-void
-tablet(int x, int y)
+void tablet(int x, int y)
 {
   xloc = ((GLfloat) x) / 500 - 4;
   yloc = ((GLfloat) y) / 1000 - 2;
@@ -48,10 +47,7 @@ tablet(int x, int y)
   glutPostRedisplay();
 }
 
-int xt = 1, yt = 1, zt = 1, xr = 1;
-
-void
-translate(int x, int y, int z)
+void translate(int x, int y, int z)
 {
   GLfloat newz;
 
@@ -69,8 +65,7 @@ translate(int x, int y, int z)
 }
 
 /* ARGSUSED1 */
-void
-rotate(int x, int y, int z)
+void rotate(int x, int y, int z)
 {
   if (xr) {
     angle += x / 2.0;
@@ -79,8 +74,7 @@ rotate(int x, int y, int z)
   }
 }
 
-void
-button(int button, int state)
+void button(int button, int state)
 {
   if (state == GLUT_DOWN) {
     switch (button) {
@@ -178,8 +172,10 @@ void recalcModelView(void)
 
 void myDisplay()
 {
-	if (newModel)
+	if(newModel)
+	{
 		recalcModelView();
+	}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear OpenGL Window
 	int trignum = trig.trigNum();
@@ -188,83 +184,61 @@ void myDisplay()
 	
 	trig.loadweight();
 	glColor3f(1.0,0.0,0.0);
-     
-
 
 	for (int i = 0 ; i < trignum; i++)  
 	{
-
-		float m1,m2,m3,min,max;//before drawing we should make sure the 
+		float m1,m2,m3,min;
 		trig.getTriangleVertices(i,v1,v2,v3);
-		//get vertices,then find the correspond vertices in attachment.
 		trig.Weight_Calculation(i,B,v1,v2,v3);
-                
+				
 		trig.getTriangleNormals(i,n1,n2,n3);
 		trig.getMorseValue(i, m1, m2, m3);
 
 		m1 = m2 = m3 = trig.color(i);
 
-		GLfloat skinColor[] = {0.1, 1., 0.1, 1.0};
-                
-		if (max >= 0) {
-			glBegin(GL_TRIANGLES);
+		GLfloat skinColor[] = {0.1, 1., 0.1, 1.0};     
+		
+		glBegin(GL_TRIANGLES);
 
-				skinColor[1] = m1; skinColor[0] = 1-m1;
-				glMaterialfv(GL_FRONT, GL_DIFFUSE, skinColor); 
-				glNormal3f(-n1[0],-n1[1],-n1[2]);
-				glVertex3f(v1[0],v1[1],v1[2]);
+		skinColor[1] = m1; skinColor[0] = 1-m1;
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, skinColor); 
+		glNormal3f(-n1[0],-n1[1],-n1[2]);
+		glVertex3f(v1[0],v1[1],v1[2]);
 
-				skinColor[1] = m2; skinColor[0] = 1-m2;
-				glMaterialfv(GL_FRONT, GL_DIFFUSE, skinColor); 
-				glNormal3f(-n2[0],-n2[1],-n2[2]);
-				glVertex3f(v2[0],v2[1],v2[2]);
+		skinColor[1] = m2; skinColor[0] = 1-m2;
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, skinColor); 
+		glNormal3f(-n2[0],-n2[1],-n2[2]);
+		glVertex3f(v2[0],v2[1],v2[2]);
 
-				skinColor[1] = m3; skinColor[0] = 1-m3;
-				glMaterialfv(GL_FRONT, GL_DIFFUSE, skinColor); 
-				glNormal3f(-n3[0],-n3[1],-n3[2]);
-				glVertex3f(v3[0],v3[1],v3[2]);
+		skinColor[1] = m3; skinColor[0] = 1-m3;
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, skinColor); 
+		glNormal3f(-n3[0],-n3[1],-n3[2]);
+		glVertex3f(v3[0],v3[1],v3[2]);
 
-				skinColor[1] = m1; skinColor[0] = 1-m1;
-				glMaterialfv(GL_FRONT, GL_DIFFUSE, skinColor); 
-				glNormal3f(-n1[0],-n1[1],-n1[2]);
-				glVertex3f(v1[0],v1[1],v1[2]);
+		skinColor[1] = m1; skinColor[0] = 1-m1;
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, skinColor); 
+		glNormal3f(-n1[0],-n1[1],-n1[2]);
+		glVertex3f(v1[0],v1[1],v1[2]);
 
-			glEnd();
-		}
-	}
-
-	 glutSwapBuffers();
+		glEnd();
+	} 
+	glutSwapBuffers();
 }
 
 
 void timerFunc(int value)
 {
-     
     degree+=2.0;
-
-    if(degree>360.f)
+    if( degree>360.f )
     {
-
-     degree-=360;
-
+    	degree-=360;
     }
     glutPostRedisplay();
     glutTimerFunc(30, timerFunc, 0);
 }
 
-
-
-int main(int argc, char **argv)
+void startDrawing( int argc, char **argv )
 {
-	if (argc >  1)  {
-		trig.loadFile(argv[1]);
-	}
-	else {
-		std::cerr << argv[0] << " <filename> " << std::endl;
-		exit(1);
-	}
-
-	int width, height;
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
 
@@ -277,7 +251,6 @@ int main(int argc, char **argv)
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHTING);
-
 
 	/* Use depth buffering for hidden surface elimination. */
 	glEnable(GL_DEPTH_TEST);
@@ -294,15 +267,31 @@ int main(int argc, char **argv)
 		  0.0, 1.0, 0.0);      /* up is in positive Y direction */
 	glPushMatrix();       /* dummy push so we can pop on model recalc */
 
-
 	glutDisplayFunc(myDisplay);// Callback function
-        glutTimerFunc(30,timerFunc, 0);
+    glutTimerFunc(30,timerFunc, 0);
 	glutMouseFunc(mouse);
 	glutMotionFunc(motion);
 	glutTabletMotionFunc(tablet);
 	glutSpaceballMotionFunc(translate);
 	glutSpaceballRotateFunc(rotate);
 	glutSpaceballButtonFunc(button);
-
+	glutSetOption( GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS );
+	std::cout << "Before glutMainLoop()!" << std::endl;
 	glutMainLoop();// Display everything and wait
+	std::cout << "Back in main()!" << std::endl;
+}
+
+int main(int argc, char **argv)
+{
+	if( argc > 1 ){
+		std::cout << "Load file" << std::endl;
+		trig.loadFile(argv[1]);
+	}
+	else{
+		std::cout << "exception" << '\n';
+		exit(1);
+	}
+
+	startDrawing(argc, argv);
+	return 0;
 }

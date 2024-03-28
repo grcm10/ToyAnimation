@@ -1,6 +1,5 @@
 set(CPM_DOWNLOAD_VERSION 0.38.7)
 
-# Expand relative path. This is important if the provided path contains a tilde (~)
 get_filename_component(CPM_DOWNLOAD_LOCATION ${CPM_DOWNLOAD_LOCATION} ABSOLUTE)
 
 function(download_cpm)

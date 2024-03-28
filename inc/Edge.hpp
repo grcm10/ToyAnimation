@@ -29,7 +29,7 @@ namespace View{
 
         void add_triangle(const int trig)
         {
-            for (int i = 0; i < _trig_list.size(); i++) 
+            for (size_t i = 0; i < _trig_list.size(); i++) 
                 if (trig == _trig_list[i]) return;
 
             _trig_list.emplace_back(trig);
@@ -37,7 +37,7 @@ namespace View{
 
         void other_trig(const int trig, std::vector<int>& others) 
         {
-            for (int i = 0; i < _trig_list.size(); i++) {
+            for (size_t i = 0; i < _trig_list.size(); i++) {
                 if (_trig_list[i] == trig) continue; 
                 else others.emplace_back(_trig_list[i]);
             }
@@ -47,8 +47,9 @@ namespace View{
         {
             for(const auto& item: list)
             {
-                if(item.second._v1 == e._v1 && item.second._v2 == e._v2 ||
-                   item.second._v2 == e._v1 && item.second._v1 == e._v2 ){
+                if( (item.second._v1 == e._v1 && item.second._v2 == e._v2 ) ||
+                    ( item.second._v2 == e._v1 && item.second._v1 == e._v2 ) )
+                {
                     return true;
                 }
             }

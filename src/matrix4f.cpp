@@ -12,7 +12,7 @@ ostream & operator << (ostream & stream, Matrix4f & obj)
 		}
 		stream << '\n';
 	}
-};
+}
 
 
 //
@@ -35,7 +35,7 @@ Matrix4f rotX(const float & rad )
   mat(1,2) = -s;
   
   return mat;
-};
+}
 
 //  create a matrix that is same as the one of OOGL 
 //  Y rot
@@ -250,7 +250,7 @@ Matrix4f rotZ(const float & rad)
 	m.setTranslation(vec);
 
 	return m;
-};
+}
 
 void Matrix4f::setTranslation(const Vector3f& vec) {
 	for (int i = 0; i < 3; i++) 
@@ -259,10 +259,10 @@ void Matrix4f::setTranslation(const Vector3f& vec) {
 	_item[3][3] = 1.0;
 }
 
-ostream & operator << (ostream & stream, Vector3f & obj) 
+/*ostream & operator << (ostream & stream, Vector3f & obj) 
 {
 	stream << obj[0] << ' ' << obj[1] << ' ' << obj[2] << ' ';
-};
+}*/
 
 
 /***

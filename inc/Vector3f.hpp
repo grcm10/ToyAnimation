@@ -14,12 +14,12 @@ public:
 
     };
 
-    float& operator[](const int index) noexcept
+    float& operator[](size_t index) noexcept
     {
         return _item[index];
     }
 
-    float operator[](const int index) const noexcept{
+    float operator[](size_t index) const noexcept{
         return _item.at(index);
     }
 
@@ -60,11 +60,11 @@ public:
         return *this;
     };
 
-    [[nodiscard]]Vector3f getRemainder( const Vector3f& ob1, const Vector3f& ob2)
+    [[nodiscard]] friend Vector3f operator %( const Vector3f& ob1, const Vector3f& ob2)
     {
         Vector3f ret{};
             
-        for(int i = 0; i < 3; i++)
+        for(size_t i = 0; i < 3; i++)
         {
             ret._item[ i ] = ob1[ ( i + 1 ) % 3 ] * ob2[ ( i + 2 ) % 3 ]
                             - ob2[ ( i + 1 ) % 3 ] * ob1[ ( i + 2 ) % 3 ];
@@ -73,10 +73,10 @@ public:
         return ret;
     }
 
-    Vector3f getPlus(const Vector3f& v1, const Vector3f& v2)
+    [[nodiscard]]friend Vector3f operator+(const Vector3f& v1, const Vector3f& v2)
     {
         Vector3f v(v1);
-        for (int i = 0; i < 3; i++)
+        for(size_t i = 0; i < 3; i++)
         {
             v[i] += v2[i];
         }
@@ -84,11 +84,11 @@ public:
         return v;
     }
 
-    Vector3f getMinus(const Vector3f& v1, const Vector3f& v2)
+    [[nodiscard]]friend Vector3f operator-(const Vector3f& v1, const Vector3f& v2)
     {
 
         Vector3f v(v1);
-        for (int i = 0; i < 3 ; i++)
+        for(size_t i = 0; i < 3 ; i++)
         {
             v[i] -= v2[i];
         }
@@ -118,7 +118,7 @@ public:
     [[nodiscard]]float normalize()
     {
         auto ret = sqrt(_item[0]*_item[0] + _item[1]*_item[1] + _item[2]*_item[2]); 
-        for (int i = 0; i < 3; i++) _item[i] /= ret;
+        for(size_t i = 0; i < 3; i++) _item[i] /= ret;
 
         return ret;
     }

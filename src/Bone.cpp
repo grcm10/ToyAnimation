@@ -17,7 +17,7 @@ void View::Bone::loadFile()
 		    f.getline(buf, sizeof(buf));
 		    sscanf(buf, "%f %f %f %f %f",&bone_num,&x,&y,&z,&next_bone_num);
                     _bone.push_back(Vector3f(x,y,z));
-                    _boneNum.push_back(next_bone_num);
+                    _boneNum.push_back(static_cast<int>(next_bone_num));
                     
      }
      f.close();
@@ -44,9 +44,7 @@ void View::Bone::BodyMotion(float degree)
 
      v_point = _bone[16];
 
-     t2 *= r1*t1;
-     _bone[16] = t2.getMulti(t2,_bone[16]);
-     //_bone[16] = t2*r1*t1*_bone[16]; // vertex after rotation
+     _bone[16] = t2*r1*t1*_bone[16]; // vertex after rotation
 
 //bone17
      //v_point = v_point.neg(old_bone[16]);//local
@@ -60,9 +58,7 @@ void View::Bone::BodyMotion(float degree)
      
      Matrix[17] = t4*r2*t3;
 
-     t4 *= r2*t3;
-     _bone[17] = t4.getMulti(t4,_bone[17]);
-     //_bone[17] = t4*r2*t3*_bone[17];// vertex after rotation
+     _bone[17] = t4*r2*t3*_bone[17];// vertex after rotation
         
 }
 
@@ -71,7 +67,7 @@ void View::Bone::SetMatrix()
     Matrix4f t1,t2,m,w;
     w.setIdentity();
     Matrix.push_back(w);
-    for(int i =1;i<_bone.size();i++)
+    for(size_t i =1;i<_bone.size();i++)
     {
        t1 = !translation(_bone[_boneNum[i]]);
        t2 =  translation(_bone[_boneNum[i]]);       

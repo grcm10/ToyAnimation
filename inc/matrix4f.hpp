@@ -10,18 +10,18 @@ class Matrix4f {
 	float _item[4][4];
 
 	public:
-	[[nodiscard]] float& operator() (const int i, const int j) noexcept{
+	[[nodiscard]] float& operator() (size_t i, size_t j) noexcept{
 		return _item[i][j];
     }
 
-	[[nodiscard]]float operator() (const int i, const int j) const noexcept{
+	[[nodiscard]]float operator() (size_t i, size_t j) const noexcept{
 		return _item[i][j];
     }
 
 	Matrix4f() 
 	{ 
-		for (int i = 0; i< 4; i++) 
-			for (int j = 0; j< 4; j++) _item[i][j] = 0; 
+		for (size_t i = 0; i< 4; i++) 
+			for (size_t j = 0; j< 4; j++) _item[i][j] = 0; 
 	}
 
 
@@ -38,8 +38,8 @@ class Matrix4f {
 
 	void setIdentity() 
 	{
-		for (int i = 0; i < 4; i++) 
-			for (int j = 0; j < 4; j++) 
+		for (size_t i = 0; i < 4; i++) 
+			for (size_t j = 0; j < 4; j++) 
 				_item[i][j] = 0;
 		_item[0][0] = _item[1][1] = _item[2][2] = _item[3][3] = 1.;
 	}
@@ -58,11 +58,11 @@ class Matrix4f {
 
 	[[nodiscard]] Matrix4f& operator= ( const Matrix4f & obj )noexcept;
 
-	[[nodiscard]]Vector3f getMulti(const Matrix4f& mat,const Vector3f& vec) 
+	[[nodiscard]]friend Vector3f operator*(const Matrix4f& mat,const Vector3f& vec) 
 	{
 		Vector3f ret{};
 
-		for (int i = 0; i < 3; i++) {
+		for (size_t i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++)
 			{
 				ret[i] += mat(i,j)* vec[j];
@@ -74,6 +74,7 @@ class Matrix4f {
 	}
 
 	friend Matrix4f operator*(const Matrix4f & obj1, const Matrix4f & obj2) noexcept;
+	//friend Vector3f operator *  (const Matrix4f & obj1, const Vector3f & obj2) ;
 };
 
 
